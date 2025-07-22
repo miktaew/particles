@@ -48,6 +48,8 @@
             <label for="Rain">Rain</label><br>
             <input type="radio" id="Stars" name="scenario" value="stars">
             <label for="Stars">Stars</label><br>
+            <input type="radio" id="PointyStars" name="scenario" value="pointy_stars">
+            <label for="PointyStars">Pointy stars</label><br>
         </fieldset>
     </div>
     <canvas id = "canvas" width = "1200" height = "800" >
@@ -159,8 +161,39 @@ class StarParticle extends BackgroundParticle {
     }
 }
 
+class PointyStarParticle extends BackgroundParticle {
+    constructor({canvas}) {
+        const size = Math.random()*6 + 6;
+
+        super({canvas, size});
+
+        this.size = size;
+
+        let degrees = 45;
+
+        this.draw = () => {
+            this.radians += 0.01;
+
+            this.tempSize = Math.max(4,this.size * Math.abs(Math.sin(this.radians)));
+            this.tempX = this.x - this.tempSize/2;
+            this.tempY = this.y - this.tempSize/2;
+
+            ctx.save();
+
+            ctx.fillStyle = `rgba(255,255,100,${this.opacity})`;
+            ctx.fillRect(this.tempX, this.tempY, this.tempSize, this.tempSize);
+            
+            ctx.translate(this.tempX+this.tempSize/2, this.tempY+this.tempSize/2);
+            ctx.rotate(degrees * Math.PI/180);
+            ctx.fillStyle = `rgba(255,255,100,${this.opacity})`;
+            ctx.fillRect(-this.tempSize/2, -this.tempSize/2, this.tempSize, this.tempSize);
+
+            ctx.restore();
+        }
+    }
+}
+
 function start_animation(type) {
-    
     
     stop_animation();
 
@@ -174,6 +207,9 @@ function start_animation(type) {
             break;
         case "stars":
             particle_class = StarParticle;
+            break;
+        case "pointy_stars":
+            particle_class = PointyStarParticle;
             break;
         default:
             particle_class = SnowParticle;
@@ -218,6 +254,12 @@ document.getElementById("Rain").addEventListener("change", (event)=> {
 document.getElementById("Stars").addEventListener("change", (event)=> {
     if(event.target.checked) {
         start_animation("stars");
+    }
+});
+
+document.getElementById("PointyStars").addEventListener("change", (event)=> {
+    if(event.target.checked) {
+        start_animation("pointy_stars");
     }
 });
 
